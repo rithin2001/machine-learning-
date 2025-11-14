@@ -1,0 +1,59 @@
+import csv
+import random
+from faker import Faker
+from datetime import datetime, timedelta
+
+fake = Faker('en_IN')  # Localized for Indian addresses
+
+# Define product catalog
+products = [
+    {"product_id": "PROD001", "name": "Wireless Earbuds", "category": "Electronics", "price": 1499},
+    {"product_id": "PROD002", "name": "Yoga Mat", "category": "Fitness", "price": 899},
+    {"product_id": "PROD003", "name": "Smartwatch", "category": "Wearables", "price": 3499},
+    {"product_id": "PROD004", "name": "Bluetooth Speaker", "category": "Audio", "price": 1999},
+    {"product_id": "PROD005", "name": "Laptop Stand", "category": "Accessories", "price": 1299}
+]
+
+# Define payment methods and order statuses
+payment_methods = ["UPI", "Credit Card", "Debit Card", "Net Banking", "Cash on Delivery"]
+order_statuses = ["Delivered", "Shipped", "Cancelled", "Returned"]
+
+# Generate synthetic data
+def generate_ecom_data(num_records=1000):
+    data = []
+    for i in range(num_records):
+        product = random.choice(products)
+        quantity = random.randint(1, 5)
+        total_amount = product["price"] * quantity
+        order_date = fake.date_between(start_date='-1y', end_date='today')
+        data.append({
+            "order_id": f"ORD{i+1000}",
+            "customer_id": f"CUST{random.randint(100,999)}",
+            "order_date": order_date.strftime("%Y-%m-%d"),
+            "product_id": product["product_id"],
+            "product_name": product["name"],
+            "category": product["category"],
+            "quantity": quantity,
+            "price_per_unit": product["price"],
+            "total_amount": total_amount,
+            "payment_method": random.choice(payment_methods),
+            "order_status": random.choice(order_statuses),
+            "shipping_address": fake.address().replace("\n", ", "),
+            "device": random.choice(["Android Mobile", "iPhone", "Windows Laptop", "MacBook"]),
+            "browser": random.choice(["Chrome", "Safari", "Edge", "Firefox"])
+        })
+    return data
+
+# Save to CSV
+def save_to_csv(data, filename="synthetic_ecom_data.csv"):
+    keys = data[0].keys()
+    with open(filename, "w", newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=keys)
+        writer.writeheader()
+        writer.writerows(data)
+
+# Run the generator
+if __name__ == "__main__":
+    ecom_data = generate_ecom_data(1000)
+    save_to_csv(ecom_data)
+    print("Synthetic ECOM data file created successfully.")
